@@ -1,1 +1,25 @@
-client_secret_531328982682-urccjsth58l3cqe8l6onf3rfuquff5s0.apps.googleusercontent.com.json
+# Dependencies
+node_modules/
+
+# Environment variables (contains secrets!)
+.env
+.env.local
+.env.production
+
+# Google OAuth credentials (NEVER commit these!)
+client_secret*.json
+
+# OS files
+.DS_Store
+
+# IDE
+.vscode/
+.idea/
+
+# Logs
+*.log
+npm-debug.log*
+
+# Build outputs
+dist/
+build/
