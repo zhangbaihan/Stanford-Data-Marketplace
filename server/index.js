@@ -8,6 +8,7 @@ const session = require('express-session');
 const connectDB = require('./config/db');
 const passport = require('./config/passport');
 const authRoutes = require('./routes/auth');
+const datasetRoutes = require('./routes/datasets');
 
 // App Initialization
 const app = express();
@@ -50,6 +51,7 @@ app.use(passport.session());
 
 // ROUTES
 app.use('/auth', authRoutes);
+app.use('/api/datasets', datasetRoutes);
 
 // At root path, backend sends the following json message to frontend
 app.get('/', (req, res) => {
