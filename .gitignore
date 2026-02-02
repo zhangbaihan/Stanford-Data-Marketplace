@@ -23,3 +23,17 @@ npm-debug.log*
 # Build outputs
 dist/
 build/
+
+# Terraform
+terraform/.terraform/
+terraform/terraform.tfstate
+terraform/terraform.tfstate.backup
+terraform/.terraform.tfstate.lock.info
+terraform/.terraform.lock.hcl
+
+# Sample data files (for local testing only)
+*.csv
+*.json
+!package.json
+!package-lock.json
+!tsconfig.json
