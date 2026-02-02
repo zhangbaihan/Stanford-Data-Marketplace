@@ -18,15 +18,6 @@ const datasetSchema = new mongoose.Schema(
             maxlength: [2000, 'Description cannot be more than 2000 characters'],
         },
 
-        // Using a tags system for categorization and searching
-        tags: [
-            {
-                type: String,
-                trim: true,
-                lowercase: true,
-            },
-        ],
-
         // *FILE INFO*
 
         fileName: {
@@ -64,7 +55,7 @@ const datasetSchema = new mongoose.Schema(
         // *VISIBILITY*
         isPublic: {
             type: Boolean,
-            default: true,
+            default: false,
         },
 
         status: {
@@ -83,7 +74,6 @@ const datasetSchema = new mongoose.Schema(
 datasetSchema.index({
     title: 'text',
     description: 'text',
-    tags: 'text',
 });
 
 const Dataset = mongoose.model('Dataset', datasetSchema);

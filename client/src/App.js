@@ -4,6 +4,7 @@ import {AuthProvider} from './context/AuthContext';
 import HomePage from './pages/HomePage';
 import DashboardPage from './pages/DashboardPage';
 import CompleteProfilePage from './pages/CompleteProfilePage';
+import UploadPage from './pages/UploadPage';
 
 function App() {
   return (
@@ -13,6 +14,7 @@ function App() {
         <Route path="/" element={<HomePage />} />
         <Route path="/dashboard" element={<DashboardPage />} />
         <Route path="/complete-profile" element={<CompleteProfilePage />} />
+        <Route path="/upload" element={<UploadPage />} /> 
       </Routes>
       </BrowserRouter>
     </AuthProvider>

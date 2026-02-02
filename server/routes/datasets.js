@@ -1,6 +1,9 @@
 const express = require('express');
 const router = express.Router();
 const Dataset = require('../models/Dataset');
+const upload = require('../config/multer');
+const { uploadFile, getDownloadUrl } = require('../services/s3service');
+const { isAuthenticated, isProfileComplete } = require('../middleware/auth');
 
 // ROUTE 1: Get All Datasets
 // GET /api/datasets
@@ -125,6 +128,98 @@ router.get('/:id', async (req, res) => {
         }
         console.error('Error fetching dataset:', error);
         res.status(500).json({ message: 'Error fetching dataset' });
+    }
+});
+
+// ROUTE 4: Upload a New Dataset
+// POST /api/datasets
+// Middleware used in a chain: isAuthenticated, isProfileComplete, upload.single('file')
+
+router.post('/', isAuthenticated, isProfileComplete, upload.single('file'), async (req,res) => {
+    try {
+        if (!req.file) {
+            return res.status(400).json({ message: 'No file uploaded' });
+        }
+
+        const { title, description, tags } = req.body;
+
+        if (!title || !description) {
+            return res.status(400).json({ 
+              message: 'Title and description are required' 
+            });
+        }
+
+        const { key, size } = await uploadFile(
+            req.file.buffer,        
+            req.file.originalname,  
+            req.file.mimetype       
+        );
+
+        const dataset = await Dataset.create({
+            title: title.trim(),
+            description: description.trim(),
+            fileName: req.file.originalname,
+            filePath: key,           // Store the S3 key
+            fileSize: size,
+            fileType: req.file.mimetype,
+            uploadedBy: req.user._id, // Link to the logged-in user
+            // isPublic defaults to false
+            // status defaults to 'pending' (for moderation)
+        });
+
+        res.status(201).json({
+            message: 'Dataset uploaded successfully',
+            dataset: {
+              id: dataset._id,
+              title: dataset.title,
+              description: dataset.description,
+              fileName: dataset.fileName,
+              fileSize: dataset.fileSize,
+              status: dataset.status,
+              createdAt: dataset.createdAt,
+            },
+        });
+    } catch (error) {
+        console.error('Error uploading dataset:', error);
+      
+        if (error.message && error.message.includes('File type not allowed')) {
+            return res.status(400).json({ message: error.message });
+        }
+      
+        res.status(500).json({ message: 'Error uploading dataset' });
+    }
+});
+
+// ROUTE 5: Download a dataset
+// GET /api/datasets/:id/download
+
+router.get('/:id/download', isAuthenticated, isProfileComplete, async (req, res) => {
+    try {
+        const { id } = req.params;
+        const dataset = await Dataset.findById(id);
+        if (!dataset) {
+            return res.status(404).json({ message: 'Dataset not found' });
+        }
+        if (!dataset.isPublic || dataset.status !== 'approved') {
+            return res.status(403).json({ message: 'This dataset is not available' });
+        }
+
+        // Get a temporary URL that allows downloading from S3
+        const downloadUrl = await getDownloadUrl(dataset.filePath);
+
+        // Track how many times this dataset was downloaded
+        await Dataset.findByIdAndUpdate(id, { $inc: { downloadCount: 1 } });
+        res.json({
+            downloadUrl: downloadUrl,
+            fileName: dataset.fileName,
+            expiresIn: 3600, // Let frontend know how long URL is valid
+        });
+    } catch (error) {
+        if (error.name === 'CastError') {
+            return res.status(400).json({ message: 'Invalid dataset ID' });
+        }
+        console.error('Error generating download URL:', error);
+        res.status(500).json({ message: 'Error generating download link' });
     }
 });
 
