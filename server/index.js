@@ -20,8 +20,8 @@ connectDB();
 // Processing Incoming Requests
 app.use(
     cors({
-        // Allow requests from React frontend
-        origin: 'http://localhost:3000',
+        // Allow requests from frontend (configurable for production)
+        origin: process.env.FRONTEND_URL || 'http://localhost:3000',
         // Allows cookies
         credentials: true,
     })
@@ -50,7 +50,7 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 // ROUTES
-app.use('/auth', authRoutes);
+app.use('/api/auth', authRoutes);
 app.use('/api/datasets', datasetRoutes);
 
 // At root path, backend sends the following json message to frontend

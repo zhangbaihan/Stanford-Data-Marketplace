@@ -30,7 +30,8 @@ passport.use(
             clientID: process.env.GOOGLE_CLIENT_ID,
             clientSecret: process.env.GOOGLE_CLIENT_SECRET,
             // Where Google should redirect after authentication
-            callbackURL: '/auth/google/callback',
+            // This URL must also be configured in Google Cloud Console
+            callbackURL: process.env.GOOGLE_CALLBACK_URL || '/api/auth/google/callback',
         },
         // Retrieves user's profile from Google
         async (accessToken, refreshToken, profile, done) => {

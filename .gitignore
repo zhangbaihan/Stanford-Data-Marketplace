@@ -23,3 +23,20 @@ npm-debug.log*
 # Build outputs
 dist/
 build/
+
+# Terraform
+terraform/.terraform/
+terraform/*.tfstate
+terraform/*.tfstate.backup
+terraform/.terraform.lock.hcl
+terraform/.terraform.tfstate.lock.info
+
+# Data files in root (use server/data/seed instead)
+/*.csv
+/*.json
+!/package.json
+!/package-lock.json
+
+# Next.js
+frontend/.next/
+frontend/out/

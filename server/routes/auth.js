@@ -18,14 +18,15 @@ router.get(
     '/google/callback',
     passport.authenticate('google', {
         // if auth fails, redirect to homepage.
-        failureRedirect: '/',
+        failureRedirect: process.env.FRONTEND_URL || 'http://localhost:3000',
     }),
     (req, res) => {
+        const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:3000';
         if (!req.user.isProfileComplete) {
-            // Hardcoded pages
-            res.redirect('http://localhost:3000/complete-profile');
+            res.redirect(`${frontendUrl}/complete-profile`);
         } else {
-            res.redirect('http://localhost:3000/dashboard');
+            // Redirect to home page after successful login
+            res.redirect(frontendUrl);
         }
     }
 );
@@ -37,7 +38,8 @@ router.get('/me', (req, res) => {
         res.json({
             isAuthenticated: true,
             user: {
-                id: req.user._id,
+                _id: req.user._id,
+                googleId: req.user.googleId,
                 email: req.user.email,
                 username: req.user.username,
                 isProfileComplete: req.user.isProfileComplete,
@@ -107,7 +109,8 @@ router.put('/complete-profile', async (req, res) => {
         res.json({
             message: 'Profile completed successfully',
             user: {
-                id: updatedUser._id,
+                _id: updatedUser._id,
+                googleId: updatedUser.googleId,
                 email: updatedUser.email,
                 username: updatedUser.username,
                 isProfileComplete: updatedUser.isProfileComplete,
