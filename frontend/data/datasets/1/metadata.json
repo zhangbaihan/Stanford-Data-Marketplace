@@ -1,0 +1,38 @@
+{
+  "id": "1",
+  "title": "Cotality Smart Data Platform: Property",
+  "description": "Tax assessment data for all U.S. states, the U.S. Virgin Islands, Guam, and Washington, D.C., as of June 2024. Formerly known as CoreLogic Smart Data Platform (SDP): Property.",
+  "abstract": "Tax assessment data for all U.S. states, the U.S. Virgin Islands, Guam, and Washington, D.C., as of June 2024.",
+  "tableCount": 1,
+  "fileCount": 0,
+  "size": "144 GB",
+  "version": "3.0",
+  "tags": ["property tax", "united states", "real property"],
+  "lastUpdated": "2026-01-30",
+  "provenance": {
+    "creator": "CoreLogic NZ Limited Cotality",
+    "contributors": [
+      { "name": "Stanford University Libraries SUL", "role": "Distributor" },
+      { "name": "Kate Barron", "role": "Data curator" },
+      { "name": "Ron Nakao", "role": "Contact person" }
+    ],
+    "doi": "10.57761/s5cs-r369"
+  },
+  "methodology": "In the United States, parcel data is public record information that describes a division of land (also referred to as \"property\" or \"real estate\"). Each parcel is given a unique identifier called an Assessor's Parcel Number or APN. The two principal types of records maintained by county government agencies for each parcel of land are deed and property tax records. When a real estate transaction takes place (e.g. a change in ownership), a property deed must be signed by both the buyer and seller. The deed will then be filed with the County Recorder's offices, sometimes called the County Clerk-Recorder or other similar title. Property tax records are maintained by County Tax Assessor's offices; they show the amount of taxes assessed on a parcel and include a detailed description of any structures or buildings on the parcel, including year built, square footages, building type, amenities like a pool, etc. There is not a uniform format for storing parcel data across the thousands of counties and county equivalents in the U.S.; laws and regulations governing real estate/property sales vary by state. Counties and county equivalents also have inconsistent approaches to archiving historical parcel data.\n\nTo fill researchers' needs for uniform parcel data, Cotality collects, cleans, and normalizes public records that they collect from U.S. County Assessor and Recorder offices. Cotality augments this data with information gathered from other public and non-public sources (e.g., loan issuers, real estate agents, landlords, etc.). The Stanford Libraries has purchased bulk extracts from Cotality's parcel data, including mortgage, owner transfer, pre-foreclosure, and historical and contemporary tax assessment data. Data is bundled into pipe-delimited text files, which are uploaded to Data Farm (Redivis) for preview, extraction and analysis.",
+  "usageNotes": "The Property, Mortgage, Owner Transfer, Historical Property and Pre-Foreclosure data can be linked on the CLIP, a unique identification number assigned to each property. Census tracts are based on the 2020 census.",
+  "supportingFiles": [
+    { "name": "cotality_sdp_property_data_dictionary_2024.txt", "type": "text" },
+    { "name": "cotality_sdp_property_counts_2024.txt", "type": "text" },
+    { "name": "Property_v3.xlsx", "type": "spreadsheet" },
+    { "name": "2025_Legacy_Content_Mapping.pdf", "type": "pdf" }
+  ],
+  "links": [
+    { "name": "SearchWorks Cotality datasets collection", "url": "#" },
+    { "name": "Cotality 2024 GitLab", "url": "#" }
+  ],
+  "license": "Cotality Bulk Data (Tax, Deed, and Pre-Foreclosure) End User License Agreement",
+  "contact": {
+    "name": "Ron Nakao",
+    "email": "ronbo@stanford.edu"
+  }
+}

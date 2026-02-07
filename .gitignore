@@ -26,14 +26,18 @@ build/
 
 # Terraform
 terraform/.terraform/
-terraform/terraform.tfstate
-terraform/terraform.tfstate.backup
-terraform/.terraform.tfstate.lock.info
+terraform/*.tfstate
+terraform/*.tfstate.backup
 terraform/.terraform.lock.hcl
+terraform/.terraform.tfstate.lock.info
 
-# Sample data files (for local testing only)
-*.csv
-*.json
-!package.json
-!package-lock.json
+# Data files in root (use server/data/seed instead)
+/*.csv
+/*.json
+!/package.json
+!/package-lock.json
 !tsconfig.json
+
+# Next.js
+frontend/.next/
+frontend/out/

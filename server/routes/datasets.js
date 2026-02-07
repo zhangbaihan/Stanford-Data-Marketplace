@@ -5,13 +5,29 @@ const upload = require('../config/multer');
 const { uploadFile, getDownloadUrl } = require('../services/s3service');
 const { isAuthenticated, isProfileComplete } = require('../middleware/auth');
 
+// ROUTE 0: Get All Unique Tags
+// GET /api/datasets/tags
+
+router.get('/tags', async (req, res) => {
+    try {
+        const tags = await Dataset.distinct('tags', {
+            isPublic: true,
+            status: 'approved',
+        });
+        res.json({ tags: tags.sort() });
+    } catch (error) {
+        console.error('Error fetching tags:', error);
+        res.status(500).json({ message: 'Error fetching tags' });
+    }
+});
+
 // ROUTE 1: Get All Datasets
 // GET /api/datasets
 
 router.get('/', async (req, res) => {
     try {
         const page = parseInt(req.query.page) || 1;
-        const limit = parseInt(req.query.limit) || 10;
+        const limit = parseInt(req.query.limit) || 50;
 
         const skip = (page - 1) * limit;
 
@@ -20,20 +36,28 @@ router.get('/', async (req, res) => {
             status: 'approved',
         };
 
-        if (req.query.tag) {
+        // Support multiple tags (comma-separated or array)
+        if (req.query.tags) {
+            const tagsArray = Array.isArray(req.query.tags) 
+                ? req.query.tags 
+                : req.query.tags.split(',').map(t => t.trim().toLowerCase());
+            filter.tags = { $in: tagsArray };
+        } else if (req.query.tag) {
+            // Backwards compatibility
             filter.tags = req.query.tag.toLowerCase();
         }
 
     // Mongoose query chain:
     // 1. find(filter) - get matching documents
     // 2. populate() - fill in the user reference
-    // 3. sort() - order the results
+    // 3. sort() - order the results (newest first)
     // 4. skip() - skip for pagination
     // 5. limit() - only return this many
-    // 6. select() - choose which fields to return (optional optimization)
+    // 6. select() - choose which fields to return (exclude internal paths)
         
         const datasets = await Dataset.find(filter)
             .populate('uploadedBy', 'username')
+            .sort({ updatedAt: -1 })
             .skip(skip)
             .limit(limit)
             .select('-filePath');

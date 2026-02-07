@@ -76,16 +76,41 @@ jobs:
           role-to-assume: arn:aws:iam::897729114392:role/github-actions-role # Placeholder ARN
           aws-region: ${{ vars.AWS_REGION }}
 
-      - name: Build React App
-        working-directory: ./client
-        run: |
-          npm install
-          npm run build
+      - name: Log in to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
 
-      - name: Deploy to S3
+      - name: Build, tag, and push frontend image to Amazon ECR
+        id: build-image
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          ECR_REPOSITORY: ${{ vars.ECR_REPOSITORY_FRONTEND }}
+          IMAGE_TAG: ${{ github.sha }}
+          NEXT_PUBLIC_API_URL: ${{ vars.API_URL }}
         run: |
-          aws s3 sync ./client/build s3://${{ vars.S3_BUCKET_FRONTEND }} --delete
+          docker build \
+            --build-arg NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL \
+            -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG \
+            -f frontend/Dockerfile ./frontend
+          docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+          echo "image=$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG" >> $GITHUB_OUTPUT
 
-      - name: Invalidate CloudFront
+      - name: Download existing task definition
         run: |
-          aws cloudfront create-invalidation --distribution-id ${{ vars.CLOUDFRONT_DISTRIBUTION_ID }} --paths "/*"
+          aws ecs describe-task-definition --task-definition ${{ vars.ECS_TASK_DEFINITION_FAMILY_FRONTEND }} --region ${{ vars.AWS_REGION }} > task-definition-frontend.json
+
+      - name: Fill in the new image ID in the Amazon ECS task definition
+        id: task-def
+        uses: aws-actions/amazon-ecs-render-task-definition@v1
+        with:
+          task-definition: task-definition-frontend.json
+          container-name: ${{ vars.ECS_CONTAINER_NAME_FRONTEND }}
+          image: ${{ steps.build-image.outputs.image }}
+
+      - name: Deploy Amazon ECS task definition
+        uses: aws-actions/amazon-ecs-deploy-task-definition@v1
+        with:
+          task-definition: ${{ steps.task-def.outputs.task-definition }}
+          service: ${{ vars.ECS_SERVICE_NAME_FRONTEND }}
+          cluster: ${{ vars.ECS_CLUSTER_NAME }}
+          wait-for-service-stability: true
