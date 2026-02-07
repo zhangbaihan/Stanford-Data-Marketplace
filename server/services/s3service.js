@@ -122,8 +122,37 @@ const {
     }
   };
   
+  // ============================================================
+  // GET FILE CONTENT (download to memory)
+  // ============================================================
+
+  /**
+   * Downloads a file from S3 and returns its content as a string.
+   * Used by the Explore feature so Claude can read dataset contents.
+   */
+  const getFileContent = async (key) => {
+    const command = new GetObjectCommand({
+      Bucket: bucketName,
+      Key: key,
+    });
+
+    try {
+      const response = await s3Client.send(command);
+      // Convert the readable stream to a string
+      const chunks = [];
+      for await (const chunk of response.Body) {
+        chunks.push(chunk);
+      }
+      return Buffer.concat(chunks).toString('utf-8');
+    } catch (error) {
+      console.error('Error downloading file content from S3:', error);
+      throw new Error('Failed to download file content');
+    }
+  };
+
   module.exports = {
     uploadFile,
     getDownloadUrl,
     deleteFile,
+    getFileContent,
   };

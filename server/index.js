@@ -9,6 +9,7 @@ const connectDB = require('./config/db');
 const passport = require('./config/passport');
 const authRoutes = require('./routes/auth');
 const datasetRoutes = require('./routes/datasets');
+const exploreRoutes = require('./routes/explore');
 
 // App Initialization
 const app = express();
@@ -52,6 +53,7 @@ app.use(passport.session());
 // ROUTES
 app.use('/api/auth', authRoutes);
 app.use('/api/datasets', datasetRoutes);
+app.use('/api/explore', exploreRoutes);
 
 // At root path, backend sends the following json message to frontend
 app.get('/', (req, res) => {

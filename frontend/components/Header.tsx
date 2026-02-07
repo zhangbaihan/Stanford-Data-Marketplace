@@ -11,7 +11,15 @@ export default function Header() {
     <header className="border-b border-gray-200">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 py-4">
         <div className="flex items-center justify-between">
-          <Logo />
+          <div className="flex items-center gap-6">
+            <Logo />
+            <Link
+              href="/explore"
+              className="text-sm text-gray-600 hover:text-gray-900 transition-colors"
+            >
+              Explore
+            </Link>
+          </div>
           
           <div className="flex items-center gap-4">
             {isLoading ? (
